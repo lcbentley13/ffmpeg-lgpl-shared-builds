@@ -1,0 +1,25 @@
+name: macos-arm64
+
+on:
+  workflow_dispatch:
+      inputs:
+        tag:
+          description: 'FFmpeg Version Tag'
+          required: true
+          type: string
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          name: FFmpeg/FFmpeg
+          ref: refs/heads/tags/${{ inputs.tag }}
+
+      - name: configure
+        run: ./configure
+
+      - name: Run a multi-line script
+        run: make
