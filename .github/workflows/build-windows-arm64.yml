@@ -18,7 +18,6 @@ jobs:
   build:
     runs-on: windows-11-arm
     env:
-      SOURCE_ARCHIVE: FFmpeg-${{ inputs.tag || github.event.inputs.tag }}-windows-arm64-source-code.tar.xz
       LIB_EXT: dll
       LIB_GLOB: output/bin/*.dll
 
@@ -29,6 +28,13 @@ jobs:
           repository: FFmpeg/FFmpeg
           ref: n${{ inputs.tag }}
           path: FFmpeg
+
+      - name: Set source archive name
+        working-directory: FFmpeg
+        shell: bash
+        run: |
+          source_short_sha="$(git rev-parse --short HEAD)"
+          echo "SOURCE_ARCHIVE=FFmpeg-${{ inputs.tag || github.event.inputs.tag }}-${source_short_sha}-source-code.tar.xz" >> "$GITHUB_ENV"
 
       - name: Generate source compliance files
         working-directory: FFmpeg
