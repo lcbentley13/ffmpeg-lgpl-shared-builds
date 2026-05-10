@@ -47,21 +47,21 @@ jobs:
           mv "$archive_path" "dist/${SOURCE_ARCHIVE}"
 
       - name: Upload source code archive artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: FFmpeg-${{ inputs.tag || github.event.inputs.tag }}-${source_short_sha}-source-code.tar.xz
           path: FFmpeg/dist/${{ env.SOURCE_ARCHIVE }}
           archive: false
 
       - name: Upload source code diff artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: changes.diff
           path: FFmpeg/dist/changes.diff
           archive: false
 
       - name: Upload source code license artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: LICENSE
           path: FFmpeg/dist/LICENSE

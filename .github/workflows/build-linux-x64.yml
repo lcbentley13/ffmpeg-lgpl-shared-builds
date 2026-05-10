@@ -46,7 +46,7 @@ jobs:
           EOF
 
       - name: Upload compilation guide
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: compilation-guide-linux-x64.txt
           path: FFmpeg/compilation-guide.txt         
@@ -99,7 +99,7 @@ jobs:
           fi
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: FFmpeg-${{ inputs.tag || github.event.inputs.tag }}-linux-x64
           path: FFmpeg/artifact_bundle/*
