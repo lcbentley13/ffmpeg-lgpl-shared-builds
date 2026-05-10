@@ -36,6 +36,7 @@ jobs:
           TAG: ${{ inputs.tag || github.event.inputs.tag }}
         run: |
           short_sha="$(git -C FFmpeg rev-parse --short HEAD)"
+          echo "SHORT_SHA=${short_sha}" >> "$GITHUB_ENV"
           source_archive="FFmpeg-${TAG}-${short_sha}-source-code.tar.xz"
           sed \
             -e "s|%%Platform%%|windows-arm64|g" \
@@ -86,5 +87,5 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: FFmpeg-${{ inputs.tag || github.event.inputs.tag }}-windows-arm64
+          name: FFmpeg-${{ inputs.tag || github.event.inputs.tag }}-${{ env.SHORT_SHA }}-windows-arm64
           path: FFmpeg/artifact/
