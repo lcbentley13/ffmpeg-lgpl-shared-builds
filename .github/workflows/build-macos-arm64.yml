@@ -17,9 +17,7 @@ on:
 jobs:
   build:
     runs-on: macos-26
-    env:
-      LIB_EXT: dylib
-      LIB_GLOB: output/lib/*.dylib
+
 
     steps:
       - name: Checkout
@@ -69,37 +67,14 @@ jobs:
         working-directory: FFmpeg
         run: make install
 
-      - name: Prepare artifact bundle
-        working-directory: FFmpeg
+      - name: Prepare library output
+        working-directory: FFmpeg/output/lib
         run: |
-          mkdir -p artifact_bundle
-          mkdir -p artifact_bundle/lib
-          cp "dist/${SOURCE_ARCHIVE}" artifact_bundle/
-          cp LICENSE artifact_bundle/
-
-          shopt -s nullglob
-          for lib in ${{ env.LIB_GLOB }}; do
-            [ -e "$lib" ] || continue
-            lib_name="$(basename "$lib")"
-
-            # Keep only the main library names (no ABI/version suffix).
-            if [[ ! "$lib_name" =~ ^lib[^.]+\.${{ env.LIB_EXT }}$ ]]; then
-              continue
-            fi
-
-            if [[ "$lib_name" =~ \.${{ env.LIB_EXT }}$ ]]; then
-              cp -L "$lib" "artifact_bundle/lib/$lib_name"
-            fi
-          done
-
-          lib_count="$(find artifact_bundle/lib -maxdepth 1 -type f -name '*.${{ env.LIB_EXT }}' | wc -l | tr -d ' ')"
-          if [[ "$lib_count" -eq 0 ]]; then
-            echo "No matching .${{ env.LIB_EXT }} files were found for macos-arm64" >&2
-            exit 1
-          fi
+          find . -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} +
+          find . -mindepth 1 -maxdepth 1 -type f -not -regex '\./lib[^./]+\.dylib' -delete
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
         with:
           name: FFmpeg-${{ inputs.tag || github.event.inputs.tag }}-macos-arm64
-          path: FFmpeg/artifact_bundle/*
+          path: FFmpeg/output/lib/
