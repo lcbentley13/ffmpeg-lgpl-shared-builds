@@ -59,7 +59,7 @@ jobs:
         run: |
           mkdir -p dist
           archive_path="$(cygpath -u "$RUNNER_TEMP")/${SOURCE_ARCHIVE}"
-          tar -cJf "$archive_path" .
+          XZ_OPT='-9e' tar -cJf "$archive_path" --exclude='./.git' --exclude='./doc' --exclude='./tests' .
           mv "$archive_path" "dist/${SOURCE_ARCHIVE}"
 
       - name: Set up MSYS2 toolchain
