@@ -1,8 +1,6 @@
 # About
 
-This software uses libraries from the FFmpeg project (https://ffmpeg.org) licensed under the GNU Lesser General Public License version 2.1 (LGPLv2.1).
-
-FFmpeg is a trademark of its respective owners.
+This software uses libraries from the FFmpeg project (https://ffmpeg.org) licensed under the GNU Lesser General Public License version 2.1 (LGPLv2.1). FFmpeg is a trademark of its respective owners.
 
 **Platform:** %%Platform%%
 
@@ -14,14 +12,7 @@ FFmpeg is licensed under the LGPL v2.1. A copy of this license is provided in th
 
 ## Source Code
 
-The complete corresponding source code for the FFmpeg libraries used in this distribution is provided in the archive `%%Source-Code-Archive%%`.
-
-This source code corresponds to the exact version used to build the distributed binaries.
-
-No functional modifications have been made to the FFmpeg source code.
-
-The source code is also available from the official FFmpeg project website:
-https://ffmpeg.org
+The complete corresponding source code for the FFmpeg libraries used in this distribution is provided in the archive `%%Source-Code-Archive%%`. This source code corresponds to the exact version used to build the distributed binaries. No functional modifications have been made to the FFmpeg source code. The source code is also available from the official FFmpeg project website: https://ffmpeg.org
 
 ## Compilation
 
@@ -33,9 +24,7 @@ The FFmpeg libraries were compiled using the following configuration:
 
 ## Dynamic Linking
 
-This application uses FFmpeg exclusively through **dynamic linking**. The FFmpeg shared libraries are located in the `/lib` directory.
-
-Users may replace these libraries with compatible versions of FFmpeg, including modified versions, without affecting the rest of the application.
+This application uses FFmpeg exclusively through **dynamic linking**. The FFmpeg shared libraries are located in the `/lib` directory. Users may replace these libraries with compatible versions of FFmpeg, including modified versions, without affecting the rest of the application.
 
 ## User Rights (LGPL Compliance)
 
