@@ -16,7 +16,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       SOURCE_ARCHIVE: FFmpeg-${{ inputs.tag || github.event.inputs.tag }}-linux-x64-source-code.tar.xz
       LIB_EXT: so
