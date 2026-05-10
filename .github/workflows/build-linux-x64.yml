@@ -48,13 +48,6 @@ jobs:
           open('FFmpeg/README.md', 'w').write(content)
           "
 
-      - name: Upload README
-        uses: actions/upload-artifact@v7
-        with:
-          name: README.md
-          path: FFmpeg/README.md
-          archive: false
-
       - name: Install NASM
         run: |
           sudo apt-get update
@@ -72,14 +65,14 @@ jobs:
         working-directory: FFmpeg
         run: make install
 
-      - name: Prepare library output
-        working-directory: FFmpeg/output/lib
+      - name: Prepare artifact
         run: |
-          find . -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} +
-          find . -mindepth 1 -maxdepth 1 -type f ! -name 'lib*.so' -delete
+          mkdir -p FFmpeg/artifact/lib
+          find FFmpeg/output/lib -mindepth 1 -maxdepth 1 -type f -name 'lib*.so' -exec cp {} FFmpeg/artifact/lib/ \;
+          cp FFmpeg/README.md FFmpeg/artifact/README.md
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
         with:
           name: FFmpeg-${{ inputs.tag || github.event.inputs.tag }}-linux-x64
-          path: FFmpeg/output/lib/
+          path: FFmpeg/artifact/

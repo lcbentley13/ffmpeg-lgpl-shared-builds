@@ -49,13 +49,6 @@ jobs:
           open('FFmpeg/README.md', 'w').write(content)
           "
       
-      - name: Upload README
-        uses: actions/upload-artifact@v7
-        with:
-          name: README.md
-          path: FFmpeg/README.md
-          archive: false
-
       - name: Set up MSYS2 toolchain
         uses: msys2/setup-msys2@v2
         with:
@@ -83,15 +76,15 @@ jobs:
         working-directory: FFmpeg
         run: make install
 
-      - name: Prepare library output
+      - name: Prepare artifact
         shell: bash
-        working-directory: FFmpeg/output/bin
         run: |
-          find . -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} +
-          find . -mindepth 1 -maxdepth 1 -type f ! -name '*.dll' -delete
+          mkdir -p FFmpeg/artifact/lib
+          find FFmpeg/output/bin -mindepth 1 -maxdepth 1 -type f -name '*.dll' -exec cp {} FFmpeg/artifact/lib/ \;
+          cp FFmpeg/README.md FFmpeg/artifact/README.md
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
         with:
           name: FFmpeg-${{ inputs.tag || github.event.inputs.tag }}-windows-arm64
-          path: FFmpeg/output/bin/
+          path: FFmpeg/artifact/
