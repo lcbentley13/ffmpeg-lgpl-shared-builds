@@ -12,7 +12,7 @@ jobs:
   build:
     runs-on: macos-latest
     env:
-      SOURCE_ARCHIVE: ffmpeg-${{ inputs.tag }}-macos-arm64-source.tar.xz
+      SOURCE_ARCHIVE: FFmpeg-${{ inputs.tag }}-source-code.tar.xz
 
     steps:
       - name: Checkout packaging repository
@@ -25,29 +25,29 @@ jobs:
         with:
           repository: FFmpeg/FFmpeg
           ref: n${{ inputs.tag }}
-          path: ffmpeg
+          path: FFmpeg
 
       - name: Generate source compliance files
-        working-directory: ffmpeg
+        working-directory: FFmpeg
         run: |
           git diff > changes.diff
           cp "$GITHUB_WORKSPACE/packaging/Compilation Guide.txt" .
           cp COPYING.LGPLv2.1 LICENSE
 
       - name: Configure
-        working-directory: ffmpeg
+        working-directory: FFmpeg
         run: ./configure --enable-shared --disable-programs --disable-doc --prefix=output
 
       - name: Build
-        working-directory: ffmpeg
+        working-directory: FFmpeg
         run: make
 
       - name: Install
-        working-directory: ffmpeg
+        working-directory: FFmpeg
         run: make install
 
       - name: Archive source code
-        working-directory: ffmpeg
+        working-directory: FFmpeg
         run: |
           mkdir -p dist
           archive_path="$RUNNER_TEMP/${SOURCE_ARCHIVE}"
@@ -57,8 +57,8 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ffmpeg-${{ inputs.tag }}-macos-arm64
+          name: FFmpeg-${{ inputs.tag }}-macos-arm64
           path: |
-            ffmpeg/dist/${{ env.SOURCE_ARCHIVE }}
-            ffmpeg/output/lib/*.dylib
-            ffmpeg/LICENSE
+            FFmpeg/dist/${{ env.SOURCE_ARCHIVE }}
+            FFmpeg/output/lib/*.dylib
+            FFmpeg/LICENSE
