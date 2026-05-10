@@ -50,6 +50,7 @@ jobs:
         with:
           name: compilation-guide-linux-x64.txt
           path: FFmpeg/compilation-guide.txt         
+          archive: false
 
       - name: Install NASM
         run: |

@@ -48,6 +48,7 @@ jobs:
         with:
           name: compilation-guide-linux-arm64.txt
           path: FFmpeg/compilation-guide.txt
+          archive: false
 
       - name: Configure
         working-directory: FFmpeg
