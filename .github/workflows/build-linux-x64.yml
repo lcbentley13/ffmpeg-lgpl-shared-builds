@@ -1,4 +1,4 @@
-name: build
+name: build-linux-x64
 
 on:
   workflow_dispatch:
@@ -7,34 +7,20 @@ on:
         description: 'FFmpeg Version'
         required: true
         type: string
+  workflow_call:
+    inputs:
+      tag:
+        description: 'FFmpeg Version'
+        required: true
+        type: string
 
 jobs:
   build:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - target: macos-arm64
-            runs_on: macos-latest
-            lib_ext: dylib
-          - target: windows-x64
-            runs_on: windows-latest
-            lib_ext: dll
-          - target: windows-arm64
-            runs_on: windows-11-arm
-            lib_ext: dll
-          - target: linux-x64
-            runs_on: ubuntu-latest
-            lib_ext: so
-          - target: linux-arm64
-            runs_on: ubuntu-24.04-arm
-            lib_ext: so
-    runs-on: ${{ matrix.runs_on }}
-    defaults:
-      run:
-        shell: bash
+    runs-on: ubuntu-latest
     env:
-      SOURCE_ARCHIVE: FFmpeg-${{ inputs.tag }}-${{ matrix.target }}-source-code.tar.xz
+      SOURCE_ARCHIVE: FFmpeg-${{ inputs.tag || github.event.inputs.tag }}-linux-x64-source-code.tar.xz
+      LIB_EXT: so
+      LIB_GLOB: output/lib/*.so
 
     steps:
       - name: Checkout packaging repository
@@ -56,16 +42,10 @@ jobs:
           cp "$GITHUB_WORKSPACE/packaging/Compilation Guide.txt" .
           cp COPYING.LGPLv2.1 LICENSE
 
-      - name: Install NASM (linux-x64 only)
-        if: matrix.target == 'linux-x64'
+      - name: Install NASM
         run: |
           sudo apt-get update
           sudo apt-get install -y nasm
-
-      - name: Install NASM (windows-arm64 only)
-        if: matrix.target == 'windows-arm64'
-        run: |
-          choco install nasm --no-progress -y
 
       - name: Configure
         working-directory: FFmpeg
@@ -95,35 +75,28 @@ jobs:
           cp LICENSE artifact_bundle/
 
           shopt -s nullglob
-          for lib in output/lib/*.${{ matrix.lib_ext }}; do
+          for lib in ${{ env.LIB_GLOB }}; do
             [ -e "$lib" ] || continue
             lib_name="$(basename "$lib")"
 
-            # Keep only the main library names for Unix builds (no ABI/version suffix).
-            if [[ "${{ matrix.lib_ext }}" == "so" || "${{ matrix.lib_ext }}" == "dylib" ]]; then
-              if [[ ! "$lib_name" =~ ^lib[^.]+\.${{ matrix.lib_ext }}$ ]]; then
-                continue
-              fi
-            fi
-
-            # Windows builds use .dll outputs; include top-level .dll names.
-            if [[ "${{ matrix.lib_ext }}" == "dll" && ! "$lib_name" =~ ^[^.]+\.dll$ ]]; then
+            # Keep only the main library names (no ABI/version suffix).
+            if [[ ! "$lib_name" =~ ^lib[^.]+\.${{ env.LIB_EXT }}$ ]]; then
               continue
             fi
 
-            if [[ "$lib_name" =~ \.${{ matrix.lib_ext }}$ ]]; then
+            if [[ "$lib_name" =~ \.${{ env.LIB_EXT }}$ ]]; then
               cp -L "$lib" "artifact_bundle/$lib_name"
             fi
           done
 
-          lib_count="$(find artifact_bundle -maxdepth 1 -type f -name '*.${{ matrix.lib_ext }}' | wc -l | tr -d ' ')"
+          lib_count="$(find artifact_bundle -maxdepth 1 -type f -name '*.${{ env.LIB_EXT }}' | wc -l | tr -d ' ')"
           if [[ "$lib_count" -eq 0 ]]; then
-            echo "No matching .${{ matrix.lib_ext }} files were found in output/lib" >&2
+            echo "No matching .${{ env.LIB_EXT }} files were found for linux-x64" >&2
             exit 1
           fi
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: FFmpeg-${{ inputs.tag }}-${{ matrix.target }}
+          name: FFmpeg-${{ inputs.tag || github.event.inputs.tag }}-linux-x64
           path: FFmpeg/artifact_bundle/*

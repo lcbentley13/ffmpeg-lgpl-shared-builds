@@ -1,0 +1,35 @@
+name: build-all
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'FFmpeg Version'
+        required: true
+        type: string
+
+jobs:
+  macos-arm64:
+    uses: ./.github/workflows/macos-arm64.yml
+    with:
+      tag: ${{ inputs.tag }}
+
+  windows-x64:
+    uses: ./.github/workflows/windows-x64.yml
+    with:
+      tag: ${{ inputs.tag }}
+
+  windows-arm64:
+    uses: ./.github/workflows/windows-arm64.yml
+    with:
+      tag: ${{ inputs.tag }}
+
+  linux-x64:
+    uses: ./.github/workflows/linux-x64.yml
+    with:
+      tag: ${{ inputs.tag }}
+
+  linux-arm64:
+    uses: ./.github/workflows/linux-arm64.yml
+    with:
+      tag: ${{ inputs.tag }}

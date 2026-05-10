@@ -1,0 +1,97 @@
+name: build-linux-arm64
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'FFmpeg Version'
+        required: true
+        type: string
+  workflow_call:
+    inputs:
+      tag:
+        description: 'FFmpeg Version'
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04-arm
+    env:
+      SOURCE_ARCHIVE: FFmpeg-${{ inputs.tag || github.event.inputs.tag }}-linux-arm64-source-code.tar.xz
+      LIB_EXT: so
+      LIB_GLOB: output/lib/*.so
+
+    steps:
+      - name: Checkout packaging repository
+        uses: actions/checkout@v4
+        with:
+          path: packaging
+
+      - name: Checkout FFmpeg
+        uses: actions/checkout@v4
+        with:
+          repository: FFmpeg/FFmpeg
+          ref: n${{ inputs.tag }}
+          path: FFmpeg
+
+      - name: Generate source compliance files
+        working-directory: FFmpeg
+        run: |
+          git diff > changes.diff
+          cp "$GITHUB_WORKSPACE/packaging/Compilation Guide.txt" .
+          cp COPYING.LGPLv2.1 LICENSE
+
+      - name: Configure
+        working-directory: FFmpeg
+        run: ./configure --enable-shared --disable-programs --disable-doc --prefix=output
+
+      - name: Build
+        working-directory: FFmpeg
+        run: make
+
+      - name: Install
+        working-directory: FFmpeg
+        run: make install
+
+      - name: Archive source code
+        working-directory: FFmpeg
+        run: |
+          mkdir -p dist
+          archive_path="$RUNNER_TEMP/${SOURCE_ARCHIVE}"
+          tar --exclude='./dist' --exclude='./output' -cJf "$archive_path" .
+          mv "$archive_path" "dist/${SOURCE_ARCHIVE}"
+
+      - name: Prepare artifact bundle
+        working-directory: FFmpeg
+        run: |
+          mkdir -p artifact_bundle
+          cp "dist/${SOURCE_ARCHIVE}" artifact_bundle/
+          cp LICENSE artifact_bundle/
+
+          shopt -s nullglob
+          for lib in ${{ env.LIB_GLOB }}; do
+            [ -e "$lib" ] || continue
+            lib_name="$(basename "$lib")"
+
+            # Keep only the main library names (no ABI/version suffix).
+            if [[ ! "$lib_name" =~ ^lib[^.]+\.${{ env.LIB_EXT }}$ ]]; then
+              continue
+            fi
+
+            if [[ "$lib_name" =~ \.${{ env.LIB_EXT }}$ ]]; then
+              cp -L "$lib" "artifact_bundle/$lib_name"
+            fi
+          done
+
+          lib_count="$(find artifact_bundle -maxdepth 1 -type f -name '*.${{ env.LIB_EXT }}' | wc -l | tr -d ' ')"
+          if [[ "$lib_count" -eq 0 ]]; then
+            echo "No matching .${{ env.LIB_EXT }} files were found for linux-arm64" >&2
+            exit 1
+          fi
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: FFmpeg-${{ inputs.tag || github.event.inputs.tag }}-linux-arm64
+          path: FFmpeg/artifact_bundle/*

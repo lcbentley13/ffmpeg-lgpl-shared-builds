@@ -1,0 +1,115 @@
+name: build-windows-x64
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'FFmpeg Version'
+        required: true
+        type: string
+  workflow_call:
+    inputs:
+      tag:
+        description: 'FFmpeg Version'
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: windows-latest
+    env:
+      SOURCE_ARCHIVE: FFmpeg-${{ inputs.tag || github.event.inputs.tag }}-windows-x64-source-code.tar.xz
+      LIB_EXT: dll
+      LIB_GLOB: output/bin/*.dll
+
+    steps:
+      - name: Checkout packaging repository
+        uses: actions/checkout@v4
+        with:
+          path: packaging
+
+      - name: Checkout FFmpeg
+        uses: actions/checkout@v4
+        with:
+          repository: FFmpeg/FFmpeg
+          ref: n${{ inputs.tag }}
+          path: FFmpeg
+
+      - name: Generate source compliance files
+        working-directory: FFmpeg
+        shell: bash
+        run: |
+          git diff > changes.diff
+          cp "$GITHUB_WORKSPACE/packaging/Compilation Guide.txt" .
+          cp COPYING.LGPLv2.1 LICENSE
+
+      - name: Set up MSYS2 toolchain
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            make
+            diffutils
+            nasm
+            pkgconf
+            mingw-w64-x86_64-gcc
+
+      - name: Configure
+        shell: msys2 {0}
+        working-directory: FFmpeg
+        run: ./configure --enable-shared --disable-programs --disable-doc --prefix=output
+
+      - name: Build
+        shell: msys2 {0}
+        working-directory: FFmpeg
+        run: make
+
+      - name: Install
+        shell: msys2 {0}
+        working-directory: FFmpeg
+        run: make install
+
+      - name: Archive source code
+        shell: bash
+        working-directory: FFmpeg
+        run: |
+          mkdir -p dist
+          archive_path="$RUNNER_TEMP/${SOURCE_ARCHIVE}"
+          tar --exclude='./dist' --exclude='./output' -cJf "$archive_path" .
+          mv "$archive_path" "dist/${SOURCE_ARCHIVE}"
+
+      - name: Prepare artifact bundle
+        shell: bash
+        working-directory: FFmpeg
+        run: |
+          mkdir -p artifact_bundle
+          cp "dist/${SOURCE_ARCHIVE}" artifact_bundle/
+          cp LICENSE artifact_bundle/
+
+          shopt -s nullglob
+          for lib in ${{ env.LIB_GLOB }}; do
+            [ -e "$lib" ] || continue
+            lib_name="$(basename "$lib")"
+
+            # Windows builds use .dll outputs; include top-level .dll names.
+            if [[ ! "$lib_name" =~ ^[^.]+\.dll$ ]]; then
+              continue
+            fi
+
+            if [[ "$lib_name" =~ \.${{ env.LIB_EXT }}$ ]]; then
+              cp -L "$lib" "artifact_bundle/$lib_name"
+            fi
+          done
+
+          lib_count="$(find artifact_bundle -maxdepth 1 -type f -name '*.${{ env.LIB_EXT }}' | wc -l | tr -d ' ')"
+          if [[ "$lib_count" -eq 0 ]]; then
+            echo "No matching .${{ env.LIB_EXT }} files were found for windows-x64" >&2
+            exit 1
+          fi
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: FFmpeg-${{ inputs.tag || github.event.inputs.tag }}-windows-x64
+          path: FFmpeg/artifact_bundle/*
