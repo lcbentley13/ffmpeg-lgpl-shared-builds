@@ -57,7 +57,7 @@ jobs:
 
       - name: Configure
         working-directory: FFmpeg
-        run: ./configure --enable-shared --disable-programs --disable-doc --prefix=output
+        run: ./configure --arch=x86_64 --enable-shared --disable-programs --disable-doc --prefix=output
 
       - name: Build
         working-directory: FFmpeg
