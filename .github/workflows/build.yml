@@ -66,8 +66,6 @@ jobs:
         if: matrix.target == 'windows-arm64'
         run: |
           choco install nasm --no-progress -y
-          export PATH="$PATH:/c/ProgramData/chocolatey/bin"
-          nasm --version
 
       - name: Configure
         working-directory: FFmpeg
