@@ -62,6 +62,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y nasm
 
+      - name: Install NASM (windows-arm64 only)
+        if: matrix.target == 'windows-arm64'
+        run: |
+          choco install nasm --no-progress -y
+          export PATH="$PATH:/c/ProgramData/chocolatey/bin"
+          nasm --version
+
       - name: Configure
         working-directory: FFmpeg
         run: ./configure --enable-shared --disable-programs --disable-doc --prefix=output
