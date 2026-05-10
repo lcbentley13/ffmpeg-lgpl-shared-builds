@@ -42,6 +42,14 @@ jobs:
           cp "$GITHUB_WORKSPACE/packaging/Compilation Guide.txt" .
           cp COPYING.LGPLv2.1 LICENSE
 
+      - name: Archive source code
+        working-directory: FFmpeg
+        run: |
+          mkdir -p dist
+          archive_path="$RUNNER_TEMP/${SOURCE_ARCHIVE}"
+          tar -cJf "$archive_path" .
+          mv "$archive_path" "dist/${SOURCE_ARCHIVE}"
+
       - name: Configure
         working-directory: FFmpeg
         run: ./configure --enable-shared --disable-programs --disable-doc --prefix=output
@@ -53,14 +61,6 @@ jobs:
       - name: Install
         working-directory: FFmpeg
         run: make install
-
-      - name: Archive source code
-        working-directory: FFmpeg
-        run: |
-          mkdir -p dist
-          archive_path="$RUNNER_TEMP/${SOURCE_ARCHIVE}"
-          tar --exclude='./dist' --exclude='./output' -cJf "$archive_path" .
-          mv "$archive_path" "dist/${SOURCE_ARCHIVE}"
 
       - name: Prepare artifact bundle
         working-directory: FFmpeg
