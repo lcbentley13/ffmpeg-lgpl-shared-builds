@@ -39,7 +39,7 @@ jobs:
           These libraries were built from the FFmpeg source code using GitHub Actions.
           Platform: macos-x64
           Runner: macos-26-intel
-          FFmpeg Version: ${{ inputs.tag || github.event.inputs.tag }} ($(git rev-parse HEAD))
+          FFmpeg Version: ${{ inputs.tag || github.event.inputs.tag }} ($(git rev-parse --short HEAD))
 
           brew install nasm
           ./configure --arch=x86_64 --enable-shared --disable-programs --disable-doc --prefix=output

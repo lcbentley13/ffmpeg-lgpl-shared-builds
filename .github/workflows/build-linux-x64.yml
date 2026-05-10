@@ -39,7 +39,7 @@ jobs:
           These libraries were built from the FFmpeg source code using GitHub Actions.
           Platform: linux-x64
           Runner: ubuntu-24.04
-          FFmpeg Version: ${{ inputs.tag || github.event.inputs.tag }} ($(git rev-parse HEAD))
+          FFmpeg Version: ${{ inputs.tag || github.event.inputs.tag }} ($(git rev-parse --short HEAD))
 
           sudo apt-get update
           sudo apt-get install -y nasm

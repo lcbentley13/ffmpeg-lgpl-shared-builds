@@ -39,7 +39,7 @@ jobs:
           These libraries were built from the FFmpeg source code using GitHub Actions.
           Platform: macos-arm64
           Runner: macos-26
-          FFmpeg Version: ${{ inputs.tag || github.event.inputs.tag }} ($(git rev-parse HEAD))
+          FFmpeg Version: ${{ inputs.tag || github.event.inputs.tag }} ($(git rev-parse --short HEAD))
 
           ./configure --arch=aarch64 --enable-shared --disable-programs --disable-doc --prefix=output
           make
