@@ -16,7 +16,7 @@ jobs:
     uses: ./.github/workflows/build-macos-x64.yml
     with:
       tag: ${{ inputs.tag }}
-      
+
   macos-arm64:
     uses: ./.github/workflows/build-macos-arm64.yml
     with:
@@ -57,7 +57,6 @@ jobs:
         with:
           pattern: FFmpeg-${{ inputs.tag }}-*
           path: release-artifacts
-          merge-multiple: true
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
