@@ -54,11 +54,29 @@ jobs:
           tar --exclude='./dist' --exclude='./output' -cJf "$archive_path" .
           mv "$archive_path" "dist/${SOURCE_ARCHIVE}"
 
+      - name: Prepare artifact bundle
+        working-directory: FFmpeg
+        run: |
+          mkdir -p artifact_bundle
+          cp "dist/${SOURCE_ARCHIVE}" artifact_bundle/
+          cp LICENSE artifact_bundle/
+
+          for lib in output/lib/*.dylib; do
+            [ -e "$lib" ] || continue
+            lib_name="$(basename "$lib")"
+            if [[ "$lib_name" =~ ^[^.]+\.dylib$ ]]; then
+              cp -L "$lib" "artifact_bundle/$lib_name"
+            fi
+          done
+
+          dylib_count="$(find artifact_bundle -maxdepth 1 -type f -name '*.dylib' | wc -l | tr -d ' ')"
+          if [[ "$dylib_count" -eq 0 ]]; then
+            echo "No unversioned dylib files were found in output/lib" >&2
+            exit 1
+          fi
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: FFmpeg-${{ inputs.tag }}-macos-arm64
-          path: |
-            FFmpeg/dist/${{ env.SOURCE_ARCHIVE }}
-            FFmpeg/output/lib/*.dylib
-            FFmpeg/LICENSE
+          path: FFmpeg/artifact_bundle/*
