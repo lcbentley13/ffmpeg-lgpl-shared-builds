@@ -61,6 +61,6 @@ jobs:
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: n${{ inputs.tag }}
+          tag_name: ${{ inputs.tag }}
           name: ${{ inputs.tag }}
           files: release-artifacts/**
