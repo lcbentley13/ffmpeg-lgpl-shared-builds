@@ -22,6 +22,9 @@ jobs:
       LIB_GLOB: output/lib/*.dylib
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Checkout FFmpeg
         uses: actions/checkout@v4
         with:
@@ -30,18 +33,22 @@ jobs:
           path: FFmpeg
 
       - name: Generate README
-        working-directory: FFmpeg
+        env:
+          TAG: ${{ inputs.tag || github.event.inputs.tag }}
         run: |
-          cat > "README.md" <<EOF
-          These libraries were built from the FFmpeg source code (as-is, unmodified) using GitHub Actions.
-          Platform: macos-arm64
-          Runner: macos-26
-          FFmpeg Version: ${{ inputs.tag || github.event.inputs.tag }} ($(git rev-parse --short HEAD))
-
-          ./configure --arch=aarch64 --enable-shared --disable-programs --disable-doc --prefix=output
-          make
-          make install
-          EOF
+          short_sha="$(git -C FFmpeg rev-parse --short HEAD)"
+          source_archive="FFmpeg-${TAG}-${short_sha}-source-code.tar.xz"
+          sed \
+            -e "s|%%Platform%%|macos-arm64|g" \
+            -e "s|%%FFmpeg-Version%%|${TAG} (${short_sha})|g" \
+            -e "s|%%Source-Code-Archive%%|${source_archive}|g" \
+            README.md > FFmpeg/README.md
+          python3 -c "
+          content = open('FFmpeg/README.md').read()
+          script = './configure --arch=aarch64 --enable-shared --disable-programs --disable-doc --prefix=output\nmake\nmake install'
+          content = content.replace('%%Compilation-Script%%', script)
+          open('FFmpeg/README.md', 'w').write(content)
+          "
 
       - name: Upload README
         uses: actions/upload-artifact@v7
