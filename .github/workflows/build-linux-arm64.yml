@@ -29,18 +29,10 @@ jobs:
           ref: n${{ inputs.tag }}
           path: FFmpeg
 
-      - name: Set source archive name
+      - name: Generate compilation guide
         working-directory: FFmpeg
         run: |
-          source_short_sha="$(git rev-parse --short HEAD)"
-          echo "SOURCE_ARCHIVE=FFmpeg-${{ inputs.tag || github.event.inputs.tag }}-${source_short_sha}-source-code.tar.xz" >> "$GITHUB_ENV"
-
-      - name: Generate source compliance files
-        working-directory: FFmpeg
-        run: |
-          git diff > changes.diff
-          cp COPYING.LGPLv2.1 LICENSE
-          cat > "Compilation Guide.txt" <<EOF
+          cat > "compilation-guide.txt" <<EOF
           These libraries were built from the FFmpeg source code using GitHub Actions.
           Platform: linux-arm64
           Runner: ubuntu-24.04-arm
@@ -51,13 +43,11 @@ jobs:
           make install
           EOF
 
-      - name: Archive source code
-        working-directory: FFmpeg
-        run: |
-          mkdir -p dist
-          archive_path="$RUNNER_TEMP/${SOURCE_ARCHIVE}"
-          XZ_OPT='-9e' tar -cJf "$archive_path" --exclude='./.git' --exclude='./doc' --exclude='./tests' .
-          mv "$archive_path" "dist/${SOURCE_ARCHIVE}"
+      - name: Upload compilation guide
+        uses: actions/upload-artifact@v4
+        with:
+          name: compilation-guide-linux-arm64.txt
+          path: FFmpeg/compilation-guide.txt
 
       - name: Configure
         working-directory: FFmpeg

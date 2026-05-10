@@ -12,6 +12,11 @@ permissions:
   contents: write
 
 jobs:
+  bundle-source-code:
+    uses: ./.github/workflows/bundle-source-code.yml
+    with:
+      tag: ${{ inputs.tag }}
+
   macos-x64:
     uses: ./.github/workflows/build-macos-x64.yml
     with:
@@ -44,6 +49,7 @@ jobs:
 
   release:
     needs:
+      - bundle-source-code
       - macos-x64
       - macos-arm64
       - windows-x64

@@ -29,20 +29,11 @@ jobs:
           ref: n${{ inputs.tag }}
           path: FFmpeg
 
-      - name: Set source archive name
+      - name: Generate compilation guide
         working-directory: FFmpeg
         shell: bash
         run: |
-          source_short_sha="$(git rev-parse --short HEAD)"
-          echo "SOURCE_ARCHIVE=FFmpeg-${{ inputs.tag || github.event.inputs.tag }}-${source_short_sha}-source-code.tar.xz" >> "$GITHUB_ENV"
-
-      - name: Generate source compliance files
-        working-directory: FFmpeg
-        shell: bash
-        run: |
-          git diff > changes.diff
-          cp COPYING.LGPLv2.1 LICENSE
-          cat > "Compilation Guide.txt" <<EOF
+          cat > "compilation-guide.txt" <<EOF
           These libraries were built from the FFmpeg source code using GitHub Actions.
           Platform: windows-arm64
           Runner: windows-11-arm (MSYS2 CLANGARM64)
@@ -52,15 +43,12 @@ jobs:
           make
           make install
           EOF
-
-      - name: Archive source code
-        shell: bash
-        working-directory: FFmpeg
-        run: |
-          mkdir -p dist
-          archive_path="$(cygpath -u "$RUNNER_TEMP")/${SOURCE_ARCHIVE}"
-          XZ_OPT='-9e' tar -cJf "$archive_path" --exclude='./.git' --exclude='./doc' --exclude='./tests' .
-          mv "$archive_path" "dist/${SOURCE_ARCHIVE}"
+      
+      - name: Upload compilation guide
+        uses: actions/upload-artifact@v4
+        with:
+          name: compilation-guide-windows-arm64.txt
+          path: FFmpeg/compilation-guide.txt
 
       - name: Set up MSYS2 toolchain
         uses: msys2/setup-msys2@v2
