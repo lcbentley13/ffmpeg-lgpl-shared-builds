@@ -23,11 +23,6 @@ jobs:
       LIB_GLOB: output/bin/*.dll
 
     steps:
-      - name: Checkout packaging repository
-        uses: actions/checkout@v4
-        with:
-          path: packaging
-
       - name: Checkout FFmpeg
         uses: actions/checkout@v4
         with:
@@ -40,8 +35,17 @@ jobs:
         shell: bash
         run: |
           git diff > changes.diff
-          cp "$GITHUB_WORKSPACE/packaging/Compilation Guide.txt" .
           cp COPYING.LGPLv2.1 LICENSE
+          cat > "Compilation Guide.txt" <<EOF
+          These libraries were built from the FFmpeg source code using GitHub Actions.
+          Platform: windows-x64
+          Runner: windows-latest (MSYS2 MINGW64)
+          FFmpeg Version: ${{ inputs.tag || github.event.inputs.tag }} ($(git rev-parse HEAD))
+
+          ./configure --arch=x86_64 --enable-shared --disable-programs --disable-doc --prefix=output
+          make
+          make install
+          EOF
 
       - name: Archive source code
         shell: bash

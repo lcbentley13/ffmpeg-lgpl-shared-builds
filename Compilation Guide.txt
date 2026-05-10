@@ -1,3 +1,0 @@
-./configure --enable-shared --disable-programs --disable-doc --prefix=output
-make
-make install

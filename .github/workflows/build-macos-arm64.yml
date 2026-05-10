@@ -23,11 +23,6 @@ jobs:
       LIB_GLOB: output/lib/*.dylib
 
     steps:
-      - name: Checkout packaging repository
-        uses: actions/checkout@v4
-        with:
-          path: packaging
-
       - name: Checkout FFmpeg
         uses: actions/checkout@v4
         with:
@@ -39,8 +34,17 @@ jobs:
         working-directory: FFmpeg
         run: |
           git diff > changes.diff
-          cp "$GITHUB_WORKSPACE/packaging/Compilation Guide.txt" .
           cp COPYING.LGPLv2.1 LICENSE
+          cat > "Compilation Guide.txt" <<EOF
+          These libraries were built from the FFmpeg source code using GitHub Actions.
+          Platform: macos-arm64
+          Runner: macos-26
+          FFmpeg Version: ${{ inputs.tag || github.event.inputs.tag }} ($(git rev-parse HEAD))
+
+          ./configure --arch=aarch64 --enable-shared --disable-programs --disable-doc --prefix=output
+          make
+          make install
+          EOF
 
       - name: Archive source code
         working-directory: FFmpeg
