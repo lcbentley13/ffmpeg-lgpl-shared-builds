@@ -56,6 +56,12 @@ jobs:
           cp "$GITHUB_WORKSPACE/packaging/Compilation Guide.txt" .
           cp COPYING.LGPLv2.1 LICENSE
 
+      - name: Install NASM (linux-x64 only)
+        if: matrix.target == 'linux-x64'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y nasm
+
       - name: Configure
         working-directory: FFmpeg
         run: ./configure --enable-shared --disable-programs --disable-doc --prefix=output
