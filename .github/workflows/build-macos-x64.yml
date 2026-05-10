@@ -50,6 +50,9 @@ jobs:
           tar -cJf "$archive_path" .
           mv "$archive_path" "dist/${SOURCE_ARCHIVE}"
 
+      - name: Install NASM
+        run: brew install nasm
+
       - name: Configure
         working-directory: FFmpeg
         run: ./configure --arch=x86_64 --enable-shared --disable-programs --disable-doc --prefix=output
