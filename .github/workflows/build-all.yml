@@ -58,4 +58,4 @@ jobs:
         with:
           tag_name: n${{ inputs.tag }}
           name: ${{ inputs.tag }}
-          files: release-artifacts/*
+          files: release-artifacts/**

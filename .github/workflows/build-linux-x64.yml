@@ -71,6 +71,7 @@ jobs:
         working-directory: FFmpeg
         run: |
           mkdir -p artifact_bundle
+          mkdir -p artifact_bundle/lib
           cp "dist/${SOURCE_ARCHIVE}" artifact_bundle/
           cp LICENSE artifact_bundle/
 
@@ -85,11 +86,11 @@ jobs:
             fi
 
             if [[ "$lib_name" =~ \.${{ env.LIB_EXT }}$ ]]; then
-              cp -L "$lib" "artifact_bundle/$lib_name"
+              cp -L "$lib" "artifact_bundle/lib/$lib_name"
             fi
           done
 
-          lib_count="$(find artifact_bundle -maxdepth 1 -type f -name '*.${{ env.LIB_EXT }}' | wc -l | tr -d ' ')"
+          lib_count="$(find artifact_bundle/lib -maxdepth 1 -type f -name '*.${{ env.LIB_EXT }}' | wc -l | tr -d ' ')"
           if [[ "$lib_count" -eq 0 ]]; then
             echo "No matching .${{ env.LIB_EXT }} files were found for linux-x64" >&2
             exit 1
