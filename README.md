@@ -5,6 +5,7 @@ This software uses libraries from the FFmpeg project (https://ffmpeg.org) licens
 FFmpeg is a trademark of its respective owners.
 
 **Platform:** %%Platform%%
+
 **FFmpeg Version:** %%FFmpeg-Version%%
 
 ## License
