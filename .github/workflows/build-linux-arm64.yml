@@ -64,7 +64,14 @@ jobs:
       - name: Prepare artifact
         run: |
           mkdir -p FFmpeg/artifact/lib
-          find FFmpeg/output/lib -mindepth 1 -maxdepth 1 \( -type f -o -type l \) -name 'lib*.so' -exec cp -L {} FFmpeg/artifact/lib/ \;
+          shopt -s nullglob
+          libs=(FFmpeg/output/lib/lib*.so)
+          if [[ ${#libs[@]} -eq 0 ]]; then
+            echo "::error::No .so files found in FFmpeg/output/lib/"
+            ls -la FFmpeg/output/lib/ || true
+            exit 1
+          fi
+          cp -L "${libs[@]}" FFmpeg/artifact/lib/
           cp FFmpeg/README.md FFmpeg/artifact/README.md
 
       - name: Upload artifacts
