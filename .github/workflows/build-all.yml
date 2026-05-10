@@ -8,6 +8,9 @@ on:
         required: true
         type: string
 
+permissions:
+  contents: write
+
 jobs:
   macos-arm64:
     uses: ./.github/workflows/build-macos-arm64.yml
@@ -33,3 +36,26 @@ jobs:
     uses: ./.github/workflows/build-linux-arm64.yml
     with:
       tag: ${{ inputs.tag }}
+
+  release:
+    needs:
+      - macos-arm64
+      - windows-x64
+      - windows-arm64
+      - linux-x64
+      - linux-arm64
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: FFmpeg-${{ inputs.tag }}-*
+          path: release-artifacts
+          merge-multiple: true
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: n${{ inputs.tag }}
+          name: ${{ inputs.tag }}
+          files: release-artifacts/*
