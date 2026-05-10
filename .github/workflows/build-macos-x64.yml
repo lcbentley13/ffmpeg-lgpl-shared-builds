@@ -29,11 +29,11 @@ jobs:
           ref: n${{ inputs.tag }}
           path: FFmpeg
 
-      - name: Generate compilation guide
+      - name: Generate README
         working-directory: FFmpeg
         run: |
-          cat > "compilation-guide.txt" <<EOF
-          These libraries were built from the FFmpeg source code using GitHub Actions.
+          cat > "README.md" <<EOF
+          These libraries were built from the FFmpeg source code (as-is, unmodified) using GitHub Actions.
           Platform: macos-x64
           Runner: macos-26-intel
           FFmpeg Version: ${{ inputs.tag || github.event.inputs.tag }} ($(git rev-parse --short HEAD))
@@ -44,11 +44,11 @@ jobs:
           make install
           EOF
 
-      - name: Upload compilation guide
+      - name: Upload README
         uses: actions/upload-artifact@v7
         with:
-          name: compilation-guide-macos-x64.txt
-          path: FFmpeg/compilation-guide.txt
+          name: README.md
+          path: FFmpeg/README.md
           archive: false
 
       - name: Install NASM
