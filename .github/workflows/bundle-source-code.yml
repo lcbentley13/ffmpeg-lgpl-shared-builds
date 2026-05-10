@@ -43,13 +43,13 @@ jobs:
         working-directory: FFmpeg
         run: |
           archive_path="$RUNNER_TEMP/${SOURCE_ARCHIVE}"
-          XZ_OPT='-9e' tar -cJf "$archive_path" --exclude='./.git' --exclude='./doc' --exclude='./tests' .
+          XZ_OPT='-9e' tar -cJf "$archive_path" .
           mv "$archive_path" "dist/${SOURCE_ARCHIVE}"
 
       - name: Upload source code archive artifact
         uses: actions/upload-artifact@v7
         with:
-          name: FFmpeg-${{ inputs.tag || github.event.inputs.tag }}-${source_short_sha}-source-code.tar.xz
+          name: ${{ env.SOURCE_ARCHIVE }}
           path: FFmpeg/dist/${{ env.SOURCE_ARCHIVE }}
           archive: false
 
