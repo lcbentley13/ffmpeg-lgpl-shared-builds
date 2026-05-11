@@ -1,12 +1,6 @@
 name: build-linux-arm64
 
 on:
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: "FFmpeg Version"
-        required: true
-        type: string
   workflow_call:
     inputs:
       tag:
@@ -74,7 +68,7 @@ jobs:
           cp FFmpeg/README.md FFmpeg/artifact/README.md
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v7
+        uses: softprops/action-gh-release@v2
         with:
           name: FFmpeg-${{ inputs.tag || github.event.inputs.tag }}-${{ env.SHORT_SHA }}-linux-arm64
           tag_name: v${{ inputs.tag }}

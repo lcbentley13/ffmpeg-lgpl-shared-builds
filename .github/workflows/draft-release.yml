@@ -1,12 +1,6 @@
 name: draft-release
 
 on:
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: "FFmpeg Version"
-        required: true
-        type: string
   workflow_call:
     inputs:
       tag:
