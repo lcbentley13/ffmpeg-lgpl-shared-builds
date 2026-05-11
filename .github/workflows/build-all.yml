@@ -67,6 +67,6 @@ jobs:
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          name: ${{ inputs.tag }}
-          tag_name: ${{ inputs.tag }}
+          name: FFmpeg v${{ inputs.tag }}
+          tag_name: v${{ inputs.tag }}
           files: release-artifacts/**
