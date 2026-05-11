@@ -80,4 +80,5 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
         with:
+          name: ${{ env.ARTIFACTS_PATH }}
           path: ${{ env.ARTIFACTS_PATH }}
