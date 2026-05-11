@@ -50,3 +50,4 @@ jobs:
         with:
           tag_name: v${{ inputs.tag }}
           files: FFmpeg/dist/LICENSE
+          draft: true

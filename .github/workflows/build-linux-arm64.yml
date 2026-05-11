@@ -76,3 +76,4 @@ jobs:
         with:
           tag_name: v${{ inputs.tag }}
           files: ${{ env.ARTIFACTS_PATH }}
+          draft: true
