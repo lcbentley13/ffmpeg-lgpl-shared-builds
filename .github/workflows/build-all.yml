@@ -63,6 +63,7 @@ jobs:
         with:
           pattern: FFmpeg-${{ inputs.tag }}-*
           path: release-artifacts
+          merge-multiple: false
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
