@@ -44,9 +44,11 @@ jobs:
         with:
           name: ${{ env.SOURCE_ARCHIVE }}
           path: FFmpeg/dist/${{ env.SOURCE_ARCHIVE }}
+          archive: false
 
       - name: Upload license artifact
         uses: actions/upload-artifact@v7
         with:
           name: LICENSE
           path: FFmpeg/dist/LICENSE
+          archive: false

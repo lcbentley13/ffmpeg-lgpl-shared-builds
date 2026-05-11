@@ -82,3 +82,4 @@ jobs:
         with:
           name: ${{ env.ARTIFACTS_PATH }}
           path: ${{ env.ARTIFACTS_PATH }}
+          archive: false
