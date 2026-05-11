@@ -12,61 +12,43 @@ permissions:
   contents: write
 
 jobs:
-  draft-release:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Draft GitHub release
-        uses: softprops/action-gh-release@v2
-        with:
-          name: FFmpeg v${{ inputs.tag }}
-          tag_name: v${{ inputs.tag }}
-          draft: true
-
   bundle-source-code:
-    needs: draft-release
     uses: ./.github/workflows/bundle-source-code.yml
     with:
       tag: ${{ inputs.tag }}
 
   macos-x64:
-    needs: draft-release
     uses: ./.github/workflows/build-macos-x64.yml
     with:
       tag: ${{ inputs.tag }}
 
   macos-arm64:
-    needs: draft-release
     uses: ./.github/workflows/build-macos-arm64.yml
     with:
       tag: ${{ inputs.tag }}
 
   windows-x64:
-    needs: draft-release
     uses: ./.github/workflows/build-windows-x64.yml
     with:
       tag: ${{ inputs.tag }}
 
   windows-arm64:
-    needs: draft-release
     uses: ./.github/workflows/build-windows-arm64.yml
     with:
       tag: ${{ inputs.tag }}
 
   linux-x64:
-    needs: draft-release
     uses: ./.github/workflows/build-linux-x64.yml
     with:
       tag: ${{ inputs.tag }}
 
   linux-arm64:
-    needs: draft-release
     uses: ./.github/workflows/build-linux-arm64.yml
     with:
       tag: ${{ inputs.tag }}
 
   publish-release:
     needs:
-      - draft-release
       - bundle-source-code
       - macos-x64
       - macos-arm64
@@ -76,9 +58,16 @@ jobs:
       - linux-arm64
     runs-on: ubuntu-latest
     steps:
-      - name: Publish GitHub release
+      - name: Download build artifacts
+        uses: actions/download-artifact@v8
+        with:
+          pattern: FFmpeg-${{ inputs.tag }}-*
+          path: release-artifacts
+          merge-multiple: false
+
+      - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
           name: FFmpeg v${{ inputs.tag }}
           tag_name: v${{ inputs.tag }}
-          draft: false
+          files: release-artifacts/**

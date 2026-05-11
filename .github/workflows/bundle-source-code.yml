@@ -40,14 +40,11 @@ jobs:
           mv "$archive_path" "dist/${SOURCE_ARCHIVE}"
 
       - name: Upload source code archive artifact
-        uses: softprops/action-gh-release@v2
+        uses: actions/upload-artifact@v7
         with:
-          tag_name: v${{ inputs.tag }}
-          files: FFmpeg/dist/${{ env.SOURCE_ARCHIVE }}
+          path: FFmpeg/dist/${{ env.SOURCE_ARCHIVE }}
 
-      - name: Upload source code license artifact
-        uses: softprops/action-gh-release@v2
+      - name: Upload license artifact
+        uses: actions/upload-artifact@v7
         with:
-          tag_name: v${{ inputs.tag }}
-          files: FFmpeg/dist/LICENSE
-          draft: true
+          path: FFmpeg/dist/LICENSE

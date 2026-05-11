@@ -85,8 +85,6 @@ jobs:
           tar -cJf "$artifacts_path" FFmpeg/artifact/
 
       - name: Upload artifacts
-        uses: softprops/action-gh-release@v2
+        uses: actions/upload-artifact@v7
         with:
-          tag_name: v${{ inputs.tag }}
-          files: ${{ env.ARTIFACTS_PATH }}
-          draft: true
+          path: ${{ env.ARTIFACTS_PATH }}
