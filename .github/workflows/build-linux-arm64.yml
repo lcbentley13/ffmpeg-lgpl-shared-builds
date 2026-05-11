@@ -69,7 +69,7 @@ jobs:
 
           artifacts_path="FFmpeg-${{ inputs.tag || github.event.inputs.tag }}-${{ env.SHORT_SHA }}-linux-arm64.tar.xz"
           echo "ARTIFACTS_PATH=${artifacts_path}" >> "$GITHUB_ENV"
-          tar -cJf "$artifacts_path" FFmpeg/artifact/
+          XZ_OPT='-9e' tar -cJf "$artifacts_path" -C FFmpeg/artifact/ .
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v7

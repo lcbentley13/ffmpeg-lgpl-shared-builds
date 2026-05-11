@@ -36,7 +36,7 @@ jobs:
         working-directory: FFmpeg
         run: |
           archive_path="$RUNNER_TEMP/${SOURCE_ARCHIVE}"
-          XZ_OPT='-9e' tar -cJf "$archive_path" --exclude='./.git' --exclude='./doc' --exclude='./tests' .
+          XZ_OPT='-9e' tar -cJf "$archive_path" --exclude='./.git' --exclude='./doc' --exclude='./tests' --exclude='./dist' .
           mv "$archive_path" "dist/${SOURCE_ARCHIVE}"
 
       - name: Upload source code archive artifact
