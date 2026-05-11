@@ -13,9 +13,14 @@ permissions:
 
 jobs:
   draft-release:
-    uses: ./.github/workflows/draft-release.yml
-    with:
-      tag: ${{ inputs.tag }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Draft GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: FFmpeg v${{ inputs.tag }}
+          tag_name: v${{ inputs.tag }}
+          draft: true
 
   bundle-source-code:
     needs: draft-release

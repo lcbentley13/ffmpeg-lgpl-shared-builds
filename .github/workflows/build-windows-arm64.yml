@@ -80,9 +80,12 @@ jobs:
           done
           cp FFmpeg/README.md FFmpeg/artifact/README.md
 
+          artifacts_path="FFmpeg-${{ inputs.tag || github.event.inputs.tag }}-${{ env.SHORT_SHA }}-windows-arm64.tar.xz"
+          echo "ARTIFACTS_PATH=${artifacts_path}" >> "$GITHUB_ENV"
+          tar -cJf "$artifacts_path" FFmpeg/artifact/
+
       - name: Upload artifacts
         uses: softprops/action-gh-release@v2
         with:
-          name: FFmpeg-${{ inputs.tag || github.event.inputs.tag }}-${{ env.SHORT_SHA }}-windows-arm64
           tag_name: v${{ inputs.tag }}
-          path: FFmpeg/artifact/
+          files: ${{ env.ARTIFACTS_PATH }}
