@@ -4,18 +4,18 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'FFmpeg Version'
+        description: "FFmpeg Version"
         required: true
         type: string
   workflow_call:
     inputs:
       tag:
-        description: 'FFmpeg Version'
+        description: "FFmpeg Version"
         required: true
         type: string
 
 jobs:
-  build:
+  bundle:
     runs-on: ubuntu-latest
 
     steps:
@@ -50,6 +50,7 @@ jobs:
         with:
           name: ${{ env.SOURCE_ARCHIVE }}
           path: FFmpeg/dist/${{ env.SOURCE_ARCHIVE }}
+          tag_name: v${{ inputs.tag }}
           archive: false
 
       - name: Upload source code license artifact
@@ -57,4 +58,5 @@ jobs:
         with:
           name: LICENSE
           path: FFmpeg/dist/LICENSE
+          tag_name: v${{ inputs.tag }}
           archive: false

@@ -4,20 +4,19 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'FFmpeg Version'
+        description: "FFmpeg Version"
         required: true
         type: string
   workflow_call:
     inputs:
       tag:
-        description: 'FFmpeg Version'
+        description: "FFmpeg Version"
         required: true
         type: string
 
 jobs:
   build:
     runs-on: windows-11-arm
-
 
     steps:
       - name: Checkout
@@ -49,7 +48,7 @@ jobs:
           content = content.replace('%%Compilation-Script%%', script)
           open('FFmpeg/README.md', 'w').write(content)
           "
-      
+
       - name: Set up MSYS2 toolchain
         uses: msys2/setup-msys2@v2
         with:
@@ -91,4 +90,5 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: FFmpeg-${{ inputs.tag || github.event.inputs.tag }}-${{ env.SHORT_SHA }}-windows-arm64
+          tag_name: v${{ inputs.tag }}
           path: FFmpeg/artifact/
